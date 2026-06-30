@@ -8,6 +8,7 @@
     "pnpm": ">=11.0.0 <12"
   },
   "scripts": {
+    "pretest:e2e": "pnpm --filter @base/web run build",
     "test:e2e": "playwright test",
     "test:dynamic": "pnpm run test:e2e",
     "test:static": "pnpm run eslintCheck && pnpm run prettierCheck",
