@@ -89,9 +89,12 @@ minimumReleaseAge: 1440
 # Omitting an entry defaults to pnpm's global policy; explicit entries document the trust decision.
 allowBuilds:
   '@nestjs/core': true # Required: runs nest-specific postinstall hooks
+  '@parcel/watcher': true # Required: file watcher for Angular dev server
   '@scarf/scarf': false # Blocked: telemetry collection — not wanted in this template
   core-js: false # Blocked: legacy polyfill — not needed with modern targets
   esbuild: true # Required: bundler used by build pipeline
+  lmdb: true # Required: Angular build cache (native bindings)
+  msgpackr-extract: true # Required: serialization for lmdb (Angular build cache)
   unrs-resolver: true # Required: compiles native bindings needed by some lint tools
 
 # Packages exempted from minimumReleaseAge during a bump cycle.
