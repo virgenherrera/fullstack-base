@@ -14,12 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       root-config: ${{ steps.filter.outputs.root-config }}
-      apps-resume: ${{ steps.filter.outputs.apps-resume }}
-      apps-readme: ${{ steps.filter.outputs.apps-readme }}
-      packages-design-system: ${{ steps.filter.outputs.packages-design-system }}
-      packages-profile: ${{ steps.filter.outputs.packages-profile }}
-      quality-resume: ${{ steps.filter.outputs.quality-resume }}
-      quality-readme: ${{ steps.filter.outputs.quality-readme }}
+      apps-api: ${{ steps.filter.outputs.apps-api }}
+      apps-web: ${{ steps.filter.outputs.apps-web }}
+      packages-api-contract: ${{ steps.filter.outputs.packages-api-contract }}
+      quality-api: ${{ steps.filter.outputs.quality-api }}
+      quality-web: ${{ steps.filter.outputs.quality-web }}
     steps:
       - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v3
@@ -34,18 +33,16 @@ jobs:
               - 'eslint.config.*'
               - '.eslintrc.*'
               - '.prettierrc*'
-            apps-resume:
-              - 'apps/resume/**'
-            apps-readme:
-              - 'apps/readme/**'
-            packages-design-system:
-              - 'packages/design-system/**'
-            packages-profile:
-              - 'packages/profile/**'
-            quality-resume:
-              - 'quality/resume/**'
-            quality-readme:
-              - 'quality/readme/**'
+            apps-api:
+              - 'apps/api/**'
+            apps-web:
+              - 'apps/web/**'
+            packages-api-contract:
+              - 'packages/api-contract/**'
+            quality-api:
+              - 'quality/api/**'
+            quality-web:
+              - 'quality/web/**'
 
   static-analysis:
     name: Static Analysis & Types
@@ -68,8 +65,9 @@ jobs:
     needs: [changes, static-analysis]
     if: >-
       needs.changes.outputs.root-config == 'true' ||
-      needs.changes.outputs.packages-profile == 'true' ||
-      needs.changes.outputs.quality-readme == 'true'
+      needs.changes.outputs.apps-api == 'true' ||
+      needs.changes.outputs.packages-api-contract == 'true' ||
+      needs.changes.outputs.quality-api == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -84,9 +82,9 @@ jobs:
     needs: [changes, static-analysis]
     if: >-
       needs.changes.outputs.root-config == 'true' ||
-      needs.changes.outputs.apps-resume == 'true' ||
-      needs.changes.outputs.packages-design-system == 'true' ||
-      needs.changes.outputs.packages-profile == 'true'
+      needs.changes.outputs.apps-api == 'true' ||
+      needs.changes.outputs.apps-web == 'true' ||
+      needs.changes.outputs.packages-api-contract == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -98,8 +96,8 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: resume-build
-          path: artifacts/resume/
+          name: build-artifacts
+          path: artifacts/
           retention-days: 1
 
   e2e-tests:
@@ -107,10 +105,11 @@ jobs:
     needs: [changes, build]
     if: >-
       needs.changes.outputs.root-config == 'true' ||
-      needs.changes.outputs.apps-resume == 'true' ||
-      needs.changes.outputs.quality-resume == 'true' ||
-      needs.changes.outputs.packages-design-system == 'true' ||
-      needs.changes.outputs.packages-profile == 'true'
+      needs.changes.outputs.apps-api == 'true' ||
+      needs.changes.outputs.apps-web == 'true' ||
+      needs.changes.outputs.quality-api == 'true' ||
+      needs.changes.outputs.quality-web == 'true' ||
+      needs.changes.outputs.packages-api-contract == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -119,8 +118,8 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v8
         with:
-          name: resume-build
-          path: artifacts/resume/
+          name: build-artifacts
+          path: artifacts/
       - name: Install Playwright browsers
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/azure-cli.list

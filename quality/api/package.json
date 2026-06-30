@@ -1,0 +1,48 @@
+{
+  "name": "@base/quality-api",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.13.0 <25",
+    "pnpm": ">=11.0.0 <12"
+  },
+  "scripts": {
+    "test:e2e": "jest",
+    "test:dynamic": "pnpm run test:e2e",
+    "test:static": "pnpm run eslintCheck && pnpm run prettierCheck",
+    "test:types": "tsc --noEmit",
+    "test:doctor": "pnpm run test:static && pnpm run test:types && pnpm run test:dynamic",
+    "eslintCheck": "eslint .",
+    "prettierCheck": "prettier --check 'src/**/*.ts'",
+    "cleanup": "rimraf ../../artifacts/quality/api/"
+  },
+  "dependencies": {
+    "@nestjs/common": "catalog:",
+    "@nestjs/core": "catalog:",
+    "@nestjs/platform-express": "catalog:",
+    "@nestjs/testing": "catalog:",
+    "reflect-metadata": "catalog:",
+    "rxjs": "catalog:"
+  },
+  "devDependencies": {
+    "@base/api-contract": "workspace:*",
+    "@eslint/js": "catalog:",
+    "@eslint/json": "catalog:",
+    "@eslint/markdown": "catalog:",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "@types/supertest": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "globals": "catalog:",
+    "jest": "catalog:",
+    "prettier": "catalog:",
+    "rimraf": "catalog:",
+    "supertest": "catalog:",
+    "ts-jest": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:",
+    "typescript-eslint": "catalog:"
+  }
+}
