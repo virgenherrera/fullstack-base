@@ -8,6 +8,9 @@ const config: Config = {
   collectCoverage: false,
   detectOpenHandles: true,
   moduleFileExtensions: ['js', 'json', 'ts'],
+  moduleNameMapper: {
+    '^@base/api/(.*)$': '<rootDir>/../../apps/api/src/$1',
+  },
   reporters: ['default', 'summary'],
   rootDir: '.',
   testEnvironment: 'node',
