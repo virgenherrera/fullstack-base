@@ -23,7 +23,7 @@
     "start:dev": "pnpm --filter @base/api-contract run build && pnpm --parallel --filter @base/api --filter @base/web run start:dev",
     "build": "pnpm -r run --if-present build",
     "test": "pnpm run cleanup && pnpm run build && pnpm run test:static && pnpm run test:types && pnpm run test:dynamic",
-    "test:doctor": "pnpm run cleanup && pnpm -r run --if-present test:doctor",
+    "test:doctor": "pnpm run cleanup && pnpm run build && pnpm -r run --if-present test:doctor",
     "test:static": "pnpm -r run --if-present test:static",
     "test:types": "pnpm -r run --if-present test:types",
     "test:unit": "pnpm -r run --if-present test:unit",
