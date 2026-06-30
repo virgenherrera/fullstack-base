@@ -1,0 +1,24 @@
+<div class="semaphore" [attr.data-status]="status()">
+  <div class="indicator"></div>
+  <div class="details">
+    @switch (status()) {
+      @case ('loading') {
+        <p>Checking API health...</p>
+      }
+      @case ('ok') {
+        <p>API is healthy</p>
+        @if (data(); as d) {
+          @if (d.appMeta) {
+            <p class="meta">{{ d.appMeta }}</p>
+          }
+          @if (d.uptime) {
+            <p class="meta">Uptime: {{ d.uptime }}</p>
+          }
+        }
+      }
+      @case ('error') {
+        <p>API is unreachable</p>
+      }
+    }
+  </div>
+</div>

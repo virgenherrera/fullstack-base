@@ -1,0 +1,68 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.semaphore {
+  --indicator-color: theme(--color-gray-400);
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-radius: 0.75rem;
+  border: 1px solid theme(--color-gray-200);
+  background: theme(--color-white);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+}
+
+.semaphore[data-status='ok'] {
+  --indicator-color: theme(--color-green-500);
+}
+
+.semaphore[data-status='error'] {
+  --indicator-color: theme(--color-red-500);
+}
+
+.semaphore[data-status='loading'] {
+  --indicator-color: theme(--color-amber-400);
+}
+
+.indicator {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--indicator-color);
+  flex-shrink: 0;
+}
+
+.semaphore[data-status='loading'] .indicator {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.details p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.details p:first-child {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.meta {
+  color: theme(--color-gray-500);
+}
