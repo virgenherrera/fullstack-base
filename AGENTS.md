@@ -138,7 +138,7 @@ La supervisión de sub-agentes es reactiva, no proactiva. No se verifican checkl
 
 **Pre-lanzamiento** — el orquestador incluye en cada prompt de delegación:
 
-- **Scope hint**: una línea que delimita el alcance. Ejemplo: `scope: "2 archivos en packages/design-system/, solo modificar"`
+- **Scope hint**: una línea que delimita el alcance. Ejemplo: `scope: "2 archivos en packages/api-contract/, solo modificar"`
 - **Objetivo verificable**: una oración que el orquestador puede evaluar binariamente contra el resultado.
 
 **Post-resultado** — el orquestador evalúa un solo invariante:
@@ -354,7 +354,7 @@ Si alguna verificación falla, corregir el handoff antes de proceder. Un handoff
 
 ### Ejemplo de Referencia
 
-El handoff de la épica `download-resume-pdf` (git ref: `bdd2221^1:.tmp-download-resume-handoff.md`, 689 líneas) es el ejemplo canónico de un handoff bien formado. Patrones clave a replicar:
+El handoff de una épica previa (689 líneas) es el ejemplo canónico de un handoff bien formado. Patrones clave a replicar:
 
 - **Back-links** — cada sección termina con `[↑ Menú](#menú)`
 - **Tablas de gates por agente** — gates específicos, no genéricos, con comandos exactos de verificación

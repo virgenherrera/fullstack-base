@@ -1,133 +1,98 @@
-<div align="center">
+# fullstack-base
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=30&pause=1000&color=3178C6&center=true&vCenter=true&width=650&height=70&lines=Hugo%20Enrique%20Virgen%20Herrera)](https://git.io/typing-svg)
+Fullstack monorepo template: NestJS + Angular + Zod API contract.
 
-**Senior Fullstack Engineer | Node.js | JavaScript | TypeScript | C# | .NET | Cloud | AI Integrations**
+## Stack
 
-![Location](https://img.shields.io/badge/📍_Mexico-555555?style=for-the-badge)
+| Layer        | Technology           |
+| ------------ | -------------------- |
+| Backend      | NestJS 11            |
+| Frontend     | Angular 22           |
+| Validation   | Zod 4                |
+| Language     | TypeScript 6         |
+| Workspaces   | pnpm workspaces      |
 
-</div>
+## Prerequisites
 
----
+| Requirement | Version        |
+| ----------- | -------------- |
+| Node.js     | >= 24.13.0     |
+| pnpm        | >= 11.0.0      |
 
-<div align="center">
+Both constraints are enforced via the `engines` field in `package.json` with `engine-strict=true`.
 
-![Node.js](https://img.shields.io/badge/Node.js-339933?logo=nodedotjs&style=for-the-badge&logoColor=white)&nbsp;
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&style=for-the-badge&logoColor=white)&nbsp;
-![Angular](https://img.shields.io/badge/Angular-DD0031?logo=angular&style=for-the-badge&logoColor=white)&nbsp;
-![React](https://img.shields.io/badge/React-61DAFB?logo=react&style=for-the-badge&logoColor=black)&nbsp;
-![AWS](https://img.shields.io/badge/AWS-232F3E?logo=amazonwebservices&style=for-the-badge&logoColor=white)&nbsp;
-![Azure](https://img.shields.io/badge/Azure-0078D4?logo=microsoftazure&style=for-the-badge&logoColor=white)&nbsp;
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?logo=nestjs&style=for-the-badge&logoColor=white)&nbsp;
-![.NET](https://img.shields.io/badge/.NET-512BD4?logo=dotnet&style=for-the-badge&logoColor=white)
+## Quick Start
 
-</div>
-
----
-
-## 👤 About
-
-> Senior Fullstack Engineer with 10+ years of hands-on experience in JavaScript and TypeScript, specializing in building scalable, high-performance web and backend applications using Node.js. Strong background in designing cloud-native systems with a focus on performance, maintainability, and clean architecture. Experienced in AI-powered integrations using LangChain and OpenAI APIs, building conversational platforms that unify isolated enterprise systems.
-
-**Spoken Languages:**&nbsp;
-![Spanish](https://img.shields.io/badge/Spanish-Native-CC0000?style=for-the-badge)&nbsp;
-![English](https://img.shields.io/badge/English-C1-1F6FEB?style=for-the-badge)
-
----
-
-```mermaid
-journey
-    title Career Journey
-    section 2015-2016
-      Fullstack Software Engineer: 3: Ramsal Software
-    section 2016
-      Frontend Software Engineer: 3: Hitss México
-    section 2016-2018
-      Full-stack Software Engineer: 5: 3Pillar Global -formerly Tiempo Development
-    section 2018-2020
-      Full Stack JavaScript Engineer: 5: EPAM Systems
-    section 2019-2020
-      Resources Manager -Leadership Development: 3: EPAM Systems
-    section 2020-2021
-      Lead Full Stack JavaScript Engineer: 3: Unosquare
-    section 2021-2024
-      Senior Fullstack Node.js Developer: 5: Globant
-    section 2024-2026
-      Senior Software Developer: 5: PwC
+```bash
+pnpm install
+pnpm run test                              # full pipeline
+pnpm --filter @base/api run start:dev      # API dev server
+pnpm --filter @base/web run start          # Angular dev server
 ```
 
----
+## Project Structure
 
-## 🛠️ Skills
+```
+fullstack-base/
+├── apps/
+│   ├── api/          — NestJS HTTP API
+│   └── web/          — Angular prerendered frontend
+├── packages/
+│   └── api-contract/ — Shared Zod schemas (source of truth)
+├── quality/
+│   ├── api/          — API E2E tests (Jest + supertest)
+│   └── web/          — Web E2E tests (Playwright)
+└── artifacts/        — Build outputs (gitignored)
+```
 
-| | Category | Technologies |
-|:---:|:---|:---|
-| 💬 | **Languages** | JavaScript, TypeScript, C#, PHP |
-| ⚙️ | **Backend Frameworks** | Node.js, NestJS, Express.js, .NET, .NET Framework |
-| 🎨 | **Frontend Frameworks** | Angular, React, Vue |
-| 🗄️ | **Databases** | PostgreSQL, MySQL, MariaDB, MongoDB, DynamoDB, Redis |
-| 🔌 | **APIs & Protocols** | REST, GraphQL, gRPC, WebSocket |
-| ☁️ | **Cloud & DevOps** | AWS, Azure, Docker, CI/CD |
-| 🗂️ | **ORMs & ODMs** | Prisma, TypeORM, Sequelize, Mongoose |
-| 🤖 | **AI & Integrations** | LangChain, OpenAI API, LLM-based orchestration |
+## Scripts
 
----
+All root-level scripts are defined in [`package.json`](package.json). They delegate to workspaces via `pnpm -r run --if-present <name>`.
 
-## 🚀 Featured Projects
+| Script              | Description                                              |
+| ------------------- | -------------------------------------------------------- |
+| `test`              | Full pipeline: cleanup, build, static, types, dynamic    |
+| `test:static`       | ESLint + Prettier across all workspaces                  |
+| `test:types`        | TypeScript type checking across all workspaces           |
+| `test:unit`         | Unit tests across all workspaces                         |
+| `test:e2e`          | E2E tests across all workspaces                          |
+| `test:dynamic`      | Unit + E2E combined                                      |
+| `test:doctor`       | Dependency health check (runs after cleanup)             |
+| `build`             | Build all workspaces                                     |
+| `cleanup`           | Remove build artifacts and workspace outputs             |
+| `bumpDependencies`  | Security fix + interactive dependency upgrade            |
+| `securityCheck`     | `pnpm audit --audit-level high`                          |
+| `securityFix`       | `pnpm update` (resolves known vulnerabilities)           |
+| `updatePnpm`        | Update pnpm via corepack                                 |
 
-| Project | Description | Stars |
-|:---|:---|:---:|
-| [**nest-base**](https://github.com/virgenherrera/nest-base) | Starter template for building NestJS 11 HTTP services with typed environment configuration, ready-made OpenAPI documentation, and a local test pipeline that mirrors CI workflows. | ![Stars](https://img.shields.io/github/stars/virgenherrera/nest-base?style=flat-square&label=⭐) |
-| [**lan-file-share**](https://github.com/virgenherrera/lan-file-share) | Application for sharing files across devices on the same Local Area Network via HTTP, featuring a NestJS backend and Angular frontend with QR code connectivity for mobile devices. | ![Stars](https://img.shields.io/github/stars/virgenherrera/lan-file-share?style=flat-square&label=⭐) |
-| [**typescript-base**](https://github.com/virgenherrera/typescript-base) | Starter template for TypeScript projects with ESLint, Prettier, Jest, and VS Code configurations for Node.js development. | ![Stars](https://img.shields.io/github/stars/virgenherrera/typescript-base?style=flat-square&label=⭐) |
-| [**tl-assistant**](https://github.com/virgenherrera/tl-assistant) | TypeScript-based assistant application built with NestJS, featuring agent-based functionality and spec-driven development conventions. | ![Stars](https://img.shields.io/github/stars/virgenherrera/tl-assistant?style=flat-square&label=⭐) |
+## Architecture
 
----
+The `api-contract` package is the single source of truth for all shared types and validation schemas. Both the API and the web frontend depend on it. Every endpoint request/response shape is defined as a Zod schema in `api-contract`, and TypeScript types are inferred from those schemas. This guarantees that backend and frontend always agree on the data contract at compile time.
 
-## 💻 Top Languages
+```
+api-contract (Zod schemas)
+    ├── api (NestJS — validates at runtime)
+    └── web (Angular — validates at compile time)
+```
 
-<div align="center">
+## DX Features
 
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=virgenherrera&layout=compact&theme=transparent&hide_border=true" alt="Top Languages" />
+- **Engine strictness**: `engines` field enforces exact Node.js and pnpm versions. No version drift across contributors.
+- **Exact dependencies via catalog**: all shared dependency versions are declared in `pnpm-workspace.yaml` under `catalog:`. Workspaces reference `catalog:` instead of pinning versions individually.
+- **Supply chain security**: `minimumReleaseAge: 1440` blocks packages published less than 24 hours ago, covering the most common attack vector for malicious package hijacking.
+- **Doctor mode**: `pnpm run test:doctor` runs a health check after dependency bumps to catch breakage early.
+- **Allow builds policy**: `allowBuilds` in `pnpm-workspace.yaml` explicitly documents which packages are trusted to run postinstall scripts. Untrusted packages are blocked by default.
 
-</div>
+## CI
 
----
+This template includes a CI-only pipeline (no CD). The CI workflow runs on every pull request targeting `master`:
 
-## 📈 GitHub Stats
+1. Static analysis (`test:static`) and type checking (`test:types`) always run
+2. Unit tests and builds run conditionally based on path filters
+3. E2E tests run after a successful build
 
-<div align="center">
+Template users define their own CD pipeline based on their deployment target. The CI workflow is designed to be extended, not replaced.
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api?username=virgenherrera&show_icons=true&theme=default&hide_border=true&rank_icon=github&include_all_commits=true&count_private=true)&nbsp;&nbsp;
-![GitHub Streak](https://streak-stats.demolab.com/?user=virgenherrera&theme=default&hide_border=true)
+## License
 
-</div>
-
----
-
-## 🤝 Let's Connect
-
-<div align="center">
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&style=for-the-badge&logoColor=white)](https://github.com/virgenherrera)&nbsp;
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&style=for-the-badge&logoColor=white)](https://www.linkedin.com/in/virgenherrera)&nbsp;
-[![Resume](https://img.shields.io/badge/Resume-4285F4?logo=googlechrome&style=for-the-badge&logoColor=white)](https://virgenherrera.github.io/virgenherrera/)
-
-</div>
-
----
-
-## 🧑‍💻 For Developers
-
-This README is auto-generated by a NestJS app on every push to `master`.
-Looking for architecture details, local setup, or contribution guidelines?
-
-**[Developer Hub → CONTRIBUTING.md](CONTRIBUTING.md)**
-
----
-
-<div align="center">
-
-*Generated by [virgenherrera](https://github.com/virgenherrera/virgenherrera)*
-
-</div>
+UNLICENSED. This is a template repository. Update the license field in `package.json` when forking for your own project.
