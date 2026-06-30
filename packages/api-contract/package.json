@@ -2,20 +2,28 @@
   "name": "@base/api-contract",
   "version": "0.1.0",
   "private": true,
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./health": "./src/health.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./health": {
+      "types": "./src/health.ts",
+      "default": "./dist/health.js"
+    }
   },
   "engines": {
     "node": ">=24.13.0 <25",
     "pnpm": ">=11.0.0 <12"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test:static": "pnpm run eslintCheck && pnpm run prettierCheck",
     "test:types": "tsc --noEmit",
     "test:doctor": "pnpm run test:static && pnpm run test:types",
-    "cleanup": "rimraf artifacts/api-contract/",
+    "cleanup": "rimraf dist/ artifacts/api-contract/",
     "eslintCheck": "eslint .",
     "prettierCheck": "prettier --check 'src/**/*.ts'"
   },

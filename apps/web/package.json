@@ -7,6 +7,7 @@
     "pnpm": ">=11.0.0 <12"
   },
   "scripts": {
+    "start:dev": "ng serve --proxy-config proxy.conf.json",
     "start": "ng serve --proxy-config proxy.conf.json",
     "build": "ng build",
     "test:static": "pnpm run eslintCheck && pnpm run prettierCheck",

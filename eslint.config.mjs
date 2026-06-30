@@ -12,6 +12,7 @@ export default defineConfig(
     ignores: [
       'eslint.config.mjs',
       '**/artifacts/**',
+      '**/dist/**',
       '**/node_modules/**',
       'README.md',
       '**/CHANGELOG.md',
@@ -36,6 +37,7 @@ export default defineConfig(
       sourceType: 'commonjs',
       parserOptions: {
         projectService: true,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
