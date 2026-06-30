@@ -1,32 +1,26 @@
 {
-  "name": "virgenherrera",
+  "name": "fullstack-base",
   "version": "1.0.0",
-  "description": "Personal monorepo",
-  "author": "Hugo Virgen (https://github.com/virgenherrera)",
+  "description": "Fullstack monorepo template: NestJS + Angular + Zod API contract",
+  "author": "",
   "private": true,
   "license": "UNLICENSED",
-  "homepage": "https://github.com/virgenherrera/virgenherrera#readme",
+  "homepage": "",
   "bugs": {
-    "url": "https://github.com/virgenherrera/virgenherrera/issues"
+    "url": ""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/virgenherrera/virgenherrera.git"
+    "url": ""
   },
-  "contributors": [
-    "Hugo Virgen (https://github.com/virgenherrera)"
-  ],
+  "contributors": [],
   "packageManager": "pnpm@11.4.0+sha512.f0febc7e37552ab485494a914241b338e0b3580b93d54ce31f00933015880863129038a1b4ae4e414a0ee63ac35bf21197e990172c4a68256450b5636310968f",
   "engines": {
     "node": ">=24.13.0 <25",
     "pnpm": ">=11.0.0 <12"
   },
   "scripts": {
-    "serve:resume": "pnpm --filter @vh/resume run start",
-    "storybook": "pnpm --filter @vh/design-system run storybook",
     "build": "pnpm -r run --if-present build",
-    "build:storybook": "pnpm --filter @vh/design-system run build:storybook",
-    "generate:readme": "pnpm --filter @vh/app-readme run start",
     "test": "pnpm run cleanup && pnpm run build && pnpm run test:static && pnpm run test:types && pnpm run test:dynamic",
     "test:doctor": "pnpm run cleanup && pnpm -r run --if-present test:doctor",
     "test:static": "pnpm -r run --if-present test:static",

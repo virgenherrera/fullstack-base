@@ -32,14 +32,6 @@ catalog:
   vitest: 4.1.9
   jsdom: 28.1.0
   postcss: 8.5.15
-  '@compodoc/compodoc': 1.2.1
-  # Storybook 10
-  '@storybook/angular': 10.4.5
-  '@storybook/addon-a11y': 10.4.5
-  '@storybook/addon-docs': 10.4.5
-  '@storybook/addon-onboarding': 10.4.5
-  'eslint-plugin-storybook': 10.4.5
-  'storybook': 10.4.5
   # runtime
   '@nestjs/axios': 4.0.1
   '@nestjs/common': 11.1.26
@@ -48,6 +40,23 @@ catalog:
   reflect-metadata: 0.2.2
   rxjs: 7.8.2
   zod: 4.4.3
+  # NestJS ecosystem (from nest-base reference)
+  '@nestjs/platform-express': 11.1.26
+  '@nestjs/swagger': 11.4.4
+  '@nestjs/config': 4.0.4
+  '@nestjs/testing': 11.1.26
+  '@nestjs/cli': 11.0.21
+  '@nestjs/schematics': 11.1.0
+  'nestjs-zod': 5.4.0
+  'compression': 1.8.1
+  'helmet': 8.2.0
+  'date-fns': 4.4.0
+  'supertest': 7.2.2
+  'source-map-support': 0.5.21
+  'ts-loader': 9.6.0
+  '@types/compression': 1.8.1
+  '@types/supertest': 7.2.0
+  '@eslint/eslintrc': 3.3.5
   # quality
   '@playwright/test': 1.61.0
   # tooling
@@ -79,14 +88,10 @@ minimumReleaseAge: 1440
 # Controls whether a package is allowed to run postinstall scripts (native build, telemetry, etc.).
 # Omitting an entry defaults to pnpm's global policy; explicit entries document the trust decision.
 allowBuilds:
-  '@compodoc/compodoc': true # Required: Angular component documentation generator for Storybook
   '@nestjs/core': true # Required: runs nest-specific postinstall hooks
-  '@parcel/watcher': true # Required: file watcher for Storybook dev server
   '@scarf/scarf': false # Blocked: telemetry collection — not wanted in this template
   core-js: false # Blocked: legacy polyfill — not needed with modern targets
-  esbuild: true # Required: bundler used by Storybook build pipeline
-  lmdb: true # Required: Storybook caching layer
-  msgpackr-extract: true # Required: serialization for Storybook internals
+  esbuild: true # Required: bundler used by build pipeline
   unrs-resolver: true # Required: compiles native bindings needed by some lint tools
 
 # Packages exempted from minimumReleaseAge during a bump cycle.
