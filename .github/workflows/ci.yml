@@ -84,7 +84,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: api-build
-          path: apps/api/artifacts/dist/
+          path: |
+            apps/api/artifacts/dist/
+            packages/api-contract/dist/
           retention-days: 1
 
   unit-tests:
@@ -126,7 +128,6 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: api-build
-          path: apps/api/artifacts/dist/
       - name: Install Playwright browsers
         run: |
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/azure-cli.list
