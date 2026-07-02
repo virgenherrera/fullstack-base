@@ -8,7 +8,6 @@
     "pnpm": ">=11.0.0 <12"
   },
   "scripts": {
-    "pretest:e2e": "pnpm --filter @base/web run build",
     "test:e2e": "playwright test",
     "test:dynamic": "pnpm run test:e2e",
     "test:static": "pnpm run eslintCheck && pnpm run prettierCheck",
@@ -28,7 +27,6 @@
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "globals": "catalog:",
-    "http-server": "14.1.1",
     "prettier": "catalog:",
     "rimraf": "catalog:",
     "typescript": "catalog:",

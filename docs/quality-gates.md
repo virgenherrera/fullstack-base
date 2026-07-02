@@ -15,6 +15,7 @@ This document defines the script architecture, pipeline order, and execution con
 - [Pipeline order contract](#pipeline-order-contract)
 - [Execution context comparison](#execution-context-comparison)
 - [Tier split: pre-commit vs pre-push](#tier-split-pre-commit-vs-pre-push)
+  - [Unified suite philosophy](#unified-suite-philosophy)
 - [Pipeline diagrams](#pipeline-diagrams)
 - [Per-workspace test:doctor](#per-workspace-testdoctor)
 - [Adding a new script](#adding-a-new-script)
@@ -50,9 +51,9 @@ This eliminates drift: if a script's command changes in any workspace, every con
 | `test:doctor`      | composite | pipeline      |  yes  |     no      |     no     |    no    | no  |   yes    |
 | `test:static`      | delegator | check         |  yes  |     no      |     no     |    no    | yes |    no    |
 | `test:types`       | delegator | check         |  yes  |     no      |     no     |    no    | yes |    no    |
-| `test:unit`        | delegator | test          |  yes  |     no      |    yes     |    no    | yes |    no    |
-| `test:e2e`         | delegator | test          |  yes  |     no      |     no     |   yes    | yes |    no    |
-| `test:dynamic`     | composite | test          |  yes  |     no      |     no     |    no    | no  |    no    |
+| `test:unit`        | delegator | test          |  yes  |     no      |     no     |    no    | yes |    no    |
+| `test:e2e`         | delegator | test          |  yes  |     no      |     no     |    no    | yes |    no    |
+| `test:dynamic`     | composite | test          |  yes  |     no      |     no     |   yes    | no  |    no    |
 | `eslintFix`        | atomic    | fix           |  yes  |     yes     |     no     |    no    | no  |    no    |
 | `prettierFix`      | atomic    | fix           |  yes  |     yes     |     no     |    no    | no  |    no    |
 | `lintStaged`       | atomic    | orchestration |  yes  |     no      |    yes     |    no    | no  |    no    |
@@ -166,18 +167,19 @@ Scripts are organized into stages. **No script in stage N may depend on a script
 
 Cross-check this matrix against `.lintstagedrc.json`, `.husky/pre-commit`, `.husky/pre-push`, `.github/workflows/ci.yml`, and `.ncurc.json` to verify consistency.
 
-| Script        | local | lint-staged |     pre-commit      |   pre-push   |        CI         |        bumpDeps         |
-| ------------- | :---: | :---------: | :-----------------: | :----------: | :---------------: | :---------------------: |
-| `securityFix` |  opt  |     no      |         no          |      no      |        no         |     yes (pre+post)      |
-| `lintStaged`  |  opt  |     no      |     yes (first)     |      no      |        no         |           no            |
-| `prettierFix` |  opt  |     yes     | no (via lintStaged) |      no      |        no         |           no            |
-| `eslintFix`   |  opt  |     yes     | no (via lintStaged) |      no      |        no         |           no            |
-| `cleanup`     |  opt  |     no      |         no          |      no      |        no         |  yes (via test:doctor)  |
-| `test:static` |  opt  |     no      |         no          |      no      |   yes (always)    |  yes (via test:doctor)  |
-| `test:types`  |  opt  |     no      |         no          |      no      |   yes (always)    |  yes (via test:doctor)  |
-| `test:unit`   |  opt  |     no      |    yes (second)     |      no      | yes (conditional) |  yes (via test:doctor)  |
-| `build`       |  opt  |     no      |         no          | yes (first)  | yes (conditional) | yes (via test:doctor) ³ |
-| `test:e2e`    |  opt  |     no      |         no          | yes (second) | yes (conditional) |          no ²           |
+| Script         | local | lint-staged |     pre-commit      |   pre-push   |        CI         |        bumpDeps         |
+| -------------- | :---: | :---------: | :-----------------: | :----------: | :---------------: | :---------------------: |
+| `securityFix`  |  opt  |     no      |         no          |      no      |        no         |     yes (pre+post)      |
+| `lintStaged`   |  opt  |     no      |         yes         |      no      |        no         |           no            |
+| `prettierFix`  |  opt  |     yes     | no (via lintStaged) |      no      |        no         |           no            |
+| `eslintFix`    |  opt  |     yes     | no (via lintStaged) |      no      |        no         |           no            |
+| `cleanup`      |  opt  |     no      |         no          |      no      |        no         |  yes (via test:doctor)  |
+| `test:static`  |  opt  |     no      |         no          |      no      |   yes (always)    |  yes (via test:doctor)  |
+| `test:types`   |  opt  |     no      |         no          |      no      |   yes (always)    |  yes (via test:doctor)  |
+| `test:unit`    |  opt  |     no      |         no          |      no      | yes (conditional) |  yes (via test:doctor)  |
+| `build`        |  opt  |     no      |         no          | yes (first)  | yes (conditional) | yes (via test:doctor) ³ |
+| `test:dynamic` |  opt  |     no      |         no          | yes (second) |        no         |           no            |
+| `test:e2e`     |  opt  |     no      |         no          |      no      | yes (conditional) |          no ²           |
 
 > ² test:e2e is excluded from test:doctor to avoid cross-workspace dependency on build artifacts during NCU doctor mode.
 >
@@ -191,14 +193,25 @@ Cross-check this matrix against `.lintstagedrc.json`, `.husky/pre-commit`, `.hus
 
 ## Tier Split: Pre-commit vs Pre-push
 
-The monorepo splits quality gates into two tiers to balance speed and thoroughness:
+### Unified Suite Philosophy
 
-| Hook       | Scripts                    | Speed   | Purpose                          |
-| ---------- | -------------------------- | ------- | -------------------------------- |
-| pre-commit | `lintStaged` → `test:unit` | ~2-3s   | Fast feedback on staged changes  |
-| pre-push   | `build` → `test:e2e`       | ~30-60s | Thorough validation before share |
+This project categorizes tests as **static** or **dynamic** — NOT as "unit" or "e2e" for hook purposes. The distinction matters:
 
-**Rationale**: building all apps and running Playwright on every commit is too slow for monorepo. Unit tests catch regressions instantly (typically under 2s). E2e and build gate the push — the point where code becomes shared.
+- **Static tests** (`test:static` + `test:types`): lint, format, type-check. Zero I/O, zero build artifacts needed. Run in CI always.
+- **Dynamic tests** (`test:dynamic` = `test:unit` + `test:e2e`): runtime validation. Needs compiled code, may need build artifacts. Gated behind `build`.
+
+Hooks consume the **unified categories**, never individual test types:
+
+| Hook       | Scripts                  | Speed   | Purpose                 |
+| ---------- | ------------------------ | ------- | ----------------------- |
+| pre-commit | `lintStaged`             | ~1-2s   | Auto-fix staged files   |
+| pre-push   | `build` → `test:dynamic` | ~30-60s | Full dynamic validation |
+
+CI is the exception: it splits `test:unit` and `test:e2e` into separate jobs for parallelism and path-filtered conditional execution. That is an optimization — the conceptual model remains static vs dynamic.
+
+**Why not `test:unit` in pre-commit?** Because the project treats unit and e2e as a single dynamic suite filtered by name. Splitting them across hooks creates a false taxonomy where "unit = fast/safe" and "e2e = slow/thorough." In practice, a broken unit test is no less important than a broken e2e test — both block the push via `test:dynamic`.
+
+**Why `test:dynamic` in pre-push instead of `test:e2e`?** Because `test:dynamic` runs ALL runtime tests (unit + e2e). Using `test:e2e` alone would skip unit test validation at push time, creating a gap where unit regressions only surface in CI.
 
 Both hooks display an informational message and support `--no-verify` bypass.
 
@@ -208,7 +221,7 @@ Both hooks display an informational message and support `--no-verify` bypass.
 
 ## Pipeline Diagrams
 
-### Pre-commit (fast tier)
+### Pre-commit (auto-fix only)
 
 ```mermaid
 flowchart TD
@@ -219,20 +232,13 @@ flowchart TD
     C --> D[.lintstagedrc.json]
     D --> E[pnpm run prettierFix -- staged-files]
     E --> F[pnpm run eslintFix -- staged-files]
-    F --> G{lintStaged done}
+    F --> G{lintStaged passed?}
 
-    G --> H[pnpm run test:unit]
-    H --> H1[pnpm -r run --if-present test:unit]
-    H1 --> H2[packages/profile: jest]
-    H1 --> H3[quality/readme: jest]
-
-    H3 --> I{All passed?}
-    H2 --> I
-    I -- yes --> J([Commit proceeds])
-    I -- no --> K([Exit 1 — commit aborted])
+    G -- yes --> H([Commit proceeds])
+    G -- no --> I([Exit 1 — commit aborted])
 ```
 
-### Pre-push (thorough tier)
+### Pre-push (unified dynamic suite)
 
 ```mermaid
 flowchart TD
@@ -240,13 +246,16 @@ flowchart TD
 
     B --> C[pnpm run build]
     C --> C1[pnpm -r run --if-present build]
-    C1 --> C2[apps/resume: ng build]
 
-    C2 --> D[pnpm run test:e2e]
-    D --> D1[pnpm -r run --if-present test:e2e]
-    D1 --> D2[quality/resume: playwright test]
+    C1 --> D[pnpm run test:dynamic]
+    D --> D1[pnpm run test:unit]
+    D --> D2[pnpm run test:e2e]
 
-    D2 --> E{All passed?}
+    D1 --> D3[pnpm -r run --if-present test:unit]
+    D2 --> D4[pnpm -r run --if-present test:e2e]
+
+    D3 --> E{All passed?}
+    D4 --> E
     E -- yes --> F([Push proceeds])
     E -- no --> G([Exit 1 — push aborted])
 ```
@@ -350,8 +359,8 @@ Each workspace defines its own `test:doctor` based on what it can validate in is
 | ------------------ | ----------------------------------------------------------------------- |
 | `test:static` (ws) | root `test:static`, `test`, CI static-analysis, workspace `test:doctor` |
 | `test:types` (ws)  | root `test:types`, `test`, CI static-analysis, workspace `test:doctor`  |
-| `test:unit` (ws)   | root `test:unit`, `test:dynamic`, `test`, pre-commit, CI unit-tests     |
-| `test:e2e` (ws)    | root `test:e2e`, `test:dynamic`, `test`, pre-push, CI e2e-tests         |
+| `test:unit` (ws)   | root `test:unit`, `test:dynamic`, `test`, pre-push (via dynamic), CI    |
+| `test:e2e` (ws)    | root `test:e2e`, `test:dynamic`, `test`, pre-push (via dynamic), CI     |
 | `build` (ws)       | root `build`, `test`, pre-push, CI build                                |
 | `test:doctor` (ws) | root `test:doctor`, `bumpDependencies` (via NCU)                        |
 

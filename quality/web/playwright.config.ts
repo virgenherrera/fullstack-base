@@ -7,11 +7,29 @@ type PlaywrightConfig = Parameters<typeof defineConfig>[0];
 
 const WEB_SERVER_TIMEOUT = 10_000;
 
-function envSchema(configDir: string) {
+// TODO(TD-002): extract to @base/test-utils when a second consumer appears
+async function getFreePort(): Promise<number> {
+  const { createServer } = await import('node:net');
+
+  return new Promise((resolve, reject) => {
+    const server = createServer();
+    server.listen(0, () => {
+      const { port } = server.address() as { port: number };
+      server.close(() => resolve(port));
+    });
+    server.on('error', reject);
+  });
+}
+
+// TODO(TD-003): extract env schema to src/schemas/playwright-env.schema.ts (virgenherrera pattern).
+// Also: add page object (src/fixtures/), test-data constants, AAA nested describes.
+// Ref: virgenherrera quality/resume/src/schemas/ + engram #765, #492.
+function envSchema(configDir: string, port: number) {
   const defaultArtifactsDir = resolve(configDir, '../../artifacts/web/browser');
   const qualityArtifactsDir = resolve(configDir, '../../artifacts/quality/web');
   const reportDir = resolve(qualityArtifactsDir, 'playwright-report');
   const outputDir = resolve(qualityArtifactsDir, 'test-results');
+  const apiCwd = resolve(configDir, '../../apps/api');
 
   return z
     .object({
@@ -19,7 +37,6 @@ function envSchema(configDir: string) {
         .string()
         .optional()
         .transform((value) => !!value),
-      PW_PORT: z.coerce.number().int().positive().default(4200),
       PW_ARTIFACTS_DIR: z
         .string()
         .default(defaultArtifactsDir)
@@ -32,10 +49,21 @@ function envSchema(configDir: string) {
           message:
             'Missing index.html — build required.\nRun: pnpm --filter @base/web build',
         })
+        .refine(({ entries }) => entries.some((f) => /^main-.*\.js$/.test(f)), {
+          message:
+            'Missing main-*.js — build required.\nRun: pnpm --filter @base/web build',
+        })
+        .refine(
+          ({ entries }) => entries.some((f) => /^styles-.*\.css$/.test(f)),
+          {
+            message:
+              'Missing styles-*.css — build required.\nRun: pnpm --filter @base/web build',
+          },
+        )
         .transform(({ dir }) => dir),
     })
     .transform((raw): PlaywrightConfig => {
-      const baseUrl = `http://localhost:${raw.PW_PORT}`;
+      const baseUrl = `http://localhost:${port}`;
 
       return {
         testDir: './src/tests',
@@ -54,9 +82,14 @@ function envSchema(configDir: string) {
           viewport: { width: 1280, height: 720 },
         },
         webServer: {
-          command: `pnpm exec http-server ${raw.PW_ARTIFACTS_DIR} --port ${raw.PW_PORT} --silent --cors -c-1`,
+          command: 'node artifacts/dist/main',
+          cwd: apiCwd,
+          env: {
+            SERVER_PORT: String(port),
+            APP_ENV: 'test',
+          },
           url: baseUrl,
-          reuseExistingServer: !raw.CI,
+          reuseExistingServer: false,
           timeout: WEB_SERVER_TIMEOUT,
         },
         projects: [
@@ -69,8 +102,16 @@ function envSchema(configDir: string) {
     });
 }
 
-export function parsePlaywrightEnv(configDir: string): PlaywrightConfig {
-  return envSchema(configDir).parse(process.env);
+export function parsePlaywrightEnv(
+  configDir: string,
+  port: number,
+): PlaywrightConfig {
+  return envSchema(configDir, port).parse(process.env);
 }
 
-export default defineConfig(parsePlaywrightEnv(import.meta.dirname));
+if (!process.env.PW_PORT) {
+  process.env.PW_PORT = String(await getFreePort());
+}
+const port = Number(process.env.PW_PORT);
+
+export default defineConfig(parsePlaywrightEnv(import.meta.dirname, port));
