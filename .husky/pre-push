@@ -1,13 +1,13 @@
 echo '
-INFO: This project has a pre-push hook that runs build and e2e verification.
-Build runs first so that e2e tests have the required artifacts.
+INFO: This project has a pre-push hook that runs build and dynamic tests.
+Build runs first so that dynamic tests have the required artifacts.
 If necessary, you can disable this with the "--no-verify" flag during the push.
 Example:
     "git push --no-verify"
 '
 
 pnpm run build && \
-pnpm run test:e2e || \
+pnpm run test:dynamic || \
 {
   echo "ERROR: Pre-push checks failed. Please address issues before pushing."
   exit 1

@@ -15,6 +15,8 @@ import { dirname, join } from 'node:path';
 
 import { AppConfig } from '../config';
 
+// TODO(TD-001): replace with @base/paths shared constants package.
+// Walks filesystem at startup — fragile. See packages/paths (to be created).
 function findRepoRoot(from: string = __dirname): string {
   let current = from;
 

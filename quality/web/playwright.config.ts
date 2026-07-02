@@ -7,6 +7,7 @@ type PlaywrightConfig = Parameters<typeof defineConfig>[0];
 
 const WEB_SERVER_TIMEOUT = 10_000;
 
+// TODO(TD-002): extract to @base/test-utils when a second consumer appears
 async function getFreePort(): Promise<number> {
   const { createServer } = await import('node:net');
 
@@ -20,6 +21,9 @@ async function getFreePort(): Promise<number> {
   });
 }
 
+// TODO(TD-003): extract env schema to src/schemas/playwright-env.schema.ts (virgenherrera pattern).
+// Also: add page object (src/fixtures/), test-data constants, AAA nested describes.
+// Ref: virgenherrera quality/resume/src/schemas/ + engram #765, #492.
 function envSchema(configDir: string, port: number) {
   const defaultArtifactsDir = resolve(configDir, '../../artifacts/web/browser');
   const qualityArtifactsDir = resolve(configDir, '../../artifacts/quality/web');
