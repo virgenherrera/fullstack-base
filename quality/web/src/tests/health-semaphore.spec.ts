@@ -7,13 +7,13 @@ test.describe('Health Semaphore', () => {
     await page.goto('/');
 
     // The prerendered page has the semaphore in "loading" state.
-    // Without a running API, afterNextRender fires and the HTTP call fails,
-    // transitioning the semaphore to "error". Both are valid render states.
+    // After hydration the semaphore transitions to "ok" (API healthy),
+    // "error" (API unreachable), or stays "loading". All are valid.
     const semaphore = page.locator('[data-status]');
     await expect(semaphore).toBeVisible({ timeout: 5000 });
 
     const status = await semaphore.getAttribute('data-status');
-    expect(['loading', 'error']).toContain(status);
+    expect(['loading', 'error', 'ok']).toContain(status);
   });
 
   test('should display the Fullstack Base heading', async ({ page }) => {
