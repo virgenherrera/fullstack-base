@@ -9,10 +9,13 @@ This document defines the script architecture, pipeline order, and execution con
 ## Navigation
 
 - [Echo principle](#echo-principle)
+- [Governed files](#governed-files)
+  - [Verification commands](#verification-commands)
 - [Script taxonomy](#script-taxonomy)
 - [Workspace echo matrix](#workspace-echo-matrix)
 - [Composite expansion](#composite-expansion)
 - [Pipeline order contract](#pipeline-order-contract)
+  - [Artifact dependency graph](#artifact-dependency-graph)
 - [Execution context comparison](#execution-context-comparison)
 - [Tier split: pre-commit vs pre-push](#tier-split-pre-commit-vs-pre-push)
   - [Unified suite philosophy](#unified-suite-philosophy)
@@ -21,6 +24,32 @@ This document defines the script architecture, pipeline order, and execution con
 - [Adding a new script](#adding-a-new-script)
 - [lint-staged forwarding note](#lint-staged-forwarding-note)
 - [Scope difference: lint-staged vs check scripts](#scope-difference-lint-staged-vs-check-scripts)
+
+## Governed Files
+
+This document governs changes to the following file patterns. Any agent modifying these files MUST read this document before creating a handoff. See AGENTS.md § Archivos Gobernados por Documentación for the enforcement mechanism.
+
+| File Pattern                            | Key Sections                                                                     |
+| --------------------------------------- | -------------------------------------------------------------------------------- |
+| `package.json` (root `scripts` section) | Echo Principle, Composite Expansion, Pipeline Order Contract                     |
+| `.husky/*`                              | Tier Split, Unified Suite Philosophy, Execution Context Comparison               |
+| `.github/workflows/*`                   | Pipeline Order Contract, Artifact Dependency Graph, Execution Context Comparison |
+| `.lintstagedrc.json`                    | Echo Principle (corollary), lint-staged Forwarding Note                          |
+| `.ncurc.json`                           | Per-Workspace test:doctor, bumpDependencies                                      |
+
+### Verification Commands
+
+After modifying governed files, run these checks. Any failure blocks merge.
+
+| Check                 | Command                                           | Expected                                                                    |
+| --------------------- | ------------------------------------------------- | --------------------------------------------------------------------------- |
+| Echo coherence        | `rg 'pnpm run' .husky/ --no-heading`              | Every script name exists in root `package.json` `scripts`                   |
+| Artifact completeness | `rg "from '@base/" apps/api/src/ --no-heading -o` | Every `@base/*` runtime import has `dist/` in CI upload-artifact            |
+| Hook taxonomy         | `bat .husky/pre-commit .husky/pre-push`           | pre-commit = `lintStaged` only; pre-push = `build` then `test:dynamic` only |
+
+[(back to menu)](#navigation)
+
+---
 
 ## Echo Principle
 
@@ -158,6 +187,20 @@ Scripts are organized into stages. **No script in stage N may depend on a script
 | 4b    | test:e2e     | `playwright test` (quality/resume — uses stage 2 artifacts) |
 
 > Build runs before all tests. This guarantees build artifacts exist for any test that needs them (Playwright e2e) and follows the standard project convention: compile first, verify second.
+
+### Artifact Dependency Graph
+
+Build outputs and their runtime consumers. When adding a new `@base/*` workspace that the API imports at runtime, add its `dist/` to the CI artifact upload in `.github/workflows/ci.yml`.
+
+| Package              | Build Output Path             | Runtime Consumer                                               | CI Upload Required |
+| -------------------- | ----------------------------- | -------------------------------------------------------------- | ------------------ |
+| `@base/web`          | `artifacts/web/`              | Playwright e2e (validates index.html, main-_.js, styles-_.css) | Yes                |
+| `@base/api`          | `apps/api/artifacts/dist/`    | Playwright webServer (`node artifacts/dist/main`)              | Yes                |
+| `@base/api-contract` | `packages/api-contract/dist/` | NestJS runtime import (`from '@base/api-contract'`)            | Yes                |
+
+Verification: `rg "from '@base/" apps/api/src/ --no-heading` — every `@base/*` import must have its corresponding `dist/` in the CI upload.
+
+> Post-mortem PR #6 (2026-07-02): first CI fix uploaded web + api artifacts but missed api-contract/dist/. The compiled API has a runtime dependency on @base/api-contract.
 
 [(back to menu)](#navigation)
 
