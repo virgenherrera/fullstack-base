@@ -90,8 +90,7 @@ jobs:
           name: api-build
           path: |
             apps/api/artifacts/dist/
-            packages/api-contract/dist/
-            packages/paths/dist/
+            packages/*/dist/
           retention-days: 1
 
   unit-tests:
