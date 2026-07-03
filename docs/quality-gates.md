@@ -197,6 +197,7 @@ Build outputs and their runtime consumers. When adding a new `@base/*` workspace
 | `@base/web`          | `artifacts/web/`              | Playwright e2e (validates index.html, main-_.js, styles-_.css) | Yes                |
 | `@base/api`          | `apps/api/artifacts/dist/`    | Playwright webServer (`node artifacts/dist/main`)              | Yes                |
 | `@base/api-contract` | `packages/api-contract/dist/` | NestJS runtime import (`from '@base/api-contract'`)            | Yes                |
+| `@base/paths`        | `packages/paths/dist/`        | NestJS runtime import (`from '@base/paths'`)                   | Yes                |
 
 Verification: `rg "from '@base/" apps/api/src/ --no-heading` — every `@base/*` import must have its corresponding `dist/` in the CI upload.
 
