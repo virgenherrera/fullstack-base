@@ -18,6 +18,7 @@
     "cleanup": "rimraf ../../artifacts/quality/web/"
   },
   "devDependencies": {
+    "@base/paths": "workspace:*",
     "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@eslint/js": "catalog:",

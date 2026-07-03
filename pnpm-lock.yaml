@@ -642,6 +642,9 @@ importers:
 
   quality/web:
     devDependencies:
+      '@base/paths':
+        specifier: workspace:*
+        version: link:../../packages/paths
       '@eslint/js':
         specifier: 'catalog:'
         version: 10.0.1(eslint@10.4.1(jiti@2.7.0))
