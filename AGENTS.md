@@ -232,12 +232,27 @@ Valores de tipo:
 
 Gates mínimos requeridos para cualquier tarea:
 
-| Gate                  | Comando                                     | Tipo |
-| --------------------- | ------------------------------------------- | ---- |
-| Handoff existe        | `eza .tmp-*-handoff.md` (exit 0)            | EXE  |
-| Lint limpio           | `pnpm test:static`                          | EXE  |
-| Tipos limpios         | `pnpm test:types`                           | EXE  |
-| Sin efectos laterales | `git diff --stat` (solo archivos esperados) | EXE  |
+| Gate                  | Comando                                                                                     | Tipo |
+| --------------------- | ------------------------------------------------------------------------------------------- | ---- |
+| Handoff existe        | `eza .tmp-*-handoff.md` (exit 0)                                                            | EXE  |
+| Lint limpio           | `pnpm test:static`                                                                          | EXE  |
+| Tipos limpios         | `pnpm test:types`                                                                           | EXE  |
+| Sin efectos laterales | `git diff --stat` (solo archivos esperados)                                                 | EXE  |
+| Contratos verificados | Comandos de verificación del documento gobernante (si el scope incluye archivos gobernados) | EXE  |
+
+### Archivos Gobernados por Documentación
+
+Archivos de documentación en `docs/` PUEDEN declarar una sección "Governed Files" listando patrones de archivos que gobiernan y comandos de verificación posteriores a la modificación. Esto crea una dependencia estructural: modificar archivos gobernados sin leer el documento gobernante produce handoffs que fallan el quality gate a continuación.
+
+Cuando el scope de un handoff incluye archivos que coinciden con un patrón gobernado:
+
+1. **LEER** — El agente DEBE leer el documento gobernante completo antes de crear el handoff.
+2. **CITAR** — El handoff DEBE incluir una sección "Verificación de Contratos" que: (a) nombre el documento gobernante y secciones relevantes, (b) cite los invariantes específicos que el cambio debe preservar, (c) declare cómo el cambio propuesto preserva cada invariante citado.
+3. **VERIFICAR** — Después de la implementación, ejecutar los comandos de verificación declarados en el documento gobernante. Incluir resultados en el progress tracker del handoff.
+
+Si el cambio viola intencionalmente un invariante documentado, el agente DEBE declarar la violación explícitamente en el handoff y obtener aprobación MIM antes de proceder.
+
+La activación es mecánica: `git diff --name-only` contra los patrones declarados. El agente no tiene discreción sobre si el gate aplica.
 
 ### Incident Tags
 
@@ -260,6 +275,7 @@ Las reglas existentes en este archivo están exentas (legacy). Las reglas nuevas
 - Incident Tags — Incident: reglas especulativas agregadas sin justificación empírica; los expertos (Kim) identificaron "Process Debt by Anticipation" como anti-patrón.
 - Diseño Cognitivo — Incident: handoffs densos y difíciles de escanear; principios de cognitive-doc-design del ecosistema gentle-ai seleccionados para mejorar legibilidad.
 - Fix Escalamiento paso 3 — Incident: la instrucción "implementa directamente" contradecía el Principio de Orquestador Puro recién agregado.
+- Archivos Gobernados por Documentación — Incident: agentes modificaron scripts, hooks y CI cumpliendo gates de proceso (handoff, lint, types) sin leer la documentación del sistema; pipeline roto en producción (post-mortem PR #6, 2026-07-02).
 
 ## Handoff
 
@@ -319,6 +335,7 @@ Cada handoff, sin importar la escala, DEBE contener como mínimo:
 6. **Modelo de ramas** — Nombre(s) de rama siguiendo el modelo definido en este archivo. Incluso un fix de una sola tarea recibe una rama de tarea.
 7. **Fuera de Alcance** — Al menos una exclusión explícita para prevenir scope creep
 8. **Diseño Cognitivo** — El contenido del handoff debe seguir estos principios: abrir con la decisión o acción (lead with the answer), progresión de happy path a detalles y edge cases (progressive disclosure), bloques semánticos cortos (chunking), y preferir tablas, checklists y templates sobre prosa narrativa (recognition over recall)
+9. **Verificación de Contratos** (condicional) — Si el scope toca archivos declarados en la sección "Governed Files" de un documento gobernante: invariantes citados, declaraciones de preservación y resultados de comandos de verificación. Omitible SOLO si ningún archivo gobernado está en scope.
 
 Secciones que PUEDEN omitirse para trabajo pequeño (bug fix, cambio de config): Arquitectura, Contratos de Interfaz Canónicos, Mapeo de Datos, Dependencias. Las secciones listadas arriba nunca son opcionales. Una tabla vacía con encabezados correctos es mejor que una sección faltante.
 
@@ -337,18 +354,19 @@ El Progress Tracker del handoff es un documento VIVO, no un plan estático. El o
 
 Después de generar el handoff, el orquestador DEBE verificar contra este checklist antes de que comience cualquier ejecución:
 
-| Verificación          | Criterio                                                                                                   | Acción si falla        |
-| --------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------- |
-| Bloque de encabezado  | Status, Branch, Artifact, Auto-cleanup presentes                                                           | Regenerar              |
-| Menú                  | Enlaces ancla a todas las secciones del documento                                                          | Agregar menú           |
-| Back-links            | Cada sección termina con `[↑ Menú](#menú)`                                                                 | Agregar enlaces        |
-| Asignación de Agentes | Tabla con nivel de modelo por agente                                                                       | Agregar tabla          |
-| Prohibiciones         | Copiadas literal de este archivo, no resumidas                                                             | Reemplazar con literal |
-| Quality Gates         | Tabla completa por tarea con columna de tipo EXE/MAN                                                       | Agregar gates          |
-| Progress Tracker      | Checkboxes reflejan Quality Gates 1:1                                                                      | Reconciliar            |
-| Modelo de ramas       | Nombres de rama y target de merge declarados                                                               | Agregar diagrama       |
-| Fuera de Alcance      | Al menos una exclusión presente                                                                            | Agregar sección        |
-| Diseño Cognitivo      | Cada sección abre con decisión/acción, no con párrafos narrativos; bloques de prosa no exceden 4 oraciones | Reestructurar          |
+| Verificación              | Criterio                                                                                                    | Acción si falla        |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Bloque de encabezado      | Status, Branch, Artifact, Auto-cleanup presentes                                                            | Regenerar              |
+| Menú                      | Enlaces ancla a todas las secciones del documento                                                           | Agregar menú           |
+| Back-links                | Cada sección termina con `[↑ Menú](#menú)`                                                                  | Agregar enlaces        |
+| Asignación de Agentes     | Tabla con nivel de modelo por agente                                                                        | Agregar tabla          |
+| Prohibiciones             | Copiadas literal de este archivo, no resumidas                                                              | Reemplazar con literal |
+| Quality Gates             | Tabla completa por tarea con columna de tipo EXE/MAN                                                        | Agregar gates          |
+| Progress Tracker          | Checkboxes reflejan Quality Gates 1:1                                                                       | Reconciliar            |
+| Modelo de ramas           | Nombres de rama y target de merge declarados                                                                | Agregar diagrama       |
+| Fuera de Alcance          | Al menos una exclusión presente                                                                             | Agregar sección        |
+| Diseño Cognitivo          | Cada sección abre con decisión/acción, no con párrafos narrativos; bloques de prosa no exceden 4 oraciones  | Reestructurar          |
+| Verificación de Contratos | Si el scope toca archivos gobernados: sección presente con invariantes citados y resultados de verificación | Agregar sección        |
 
 Si alguna verificación falla, corregir el handoff antes de proceder. Un handoff malformado no es "suficiente por ahora".
 
