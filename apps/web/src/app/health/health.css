@@ -87,10 +87,10 @@
   font-weight: 500;
 }
 
-.metric-value[data-status='up'] {
+.metric-value[data-health='up'] {
   color: theme(--color-green-500);
 }
 
-.metric-value[data-status='down'] {
+.metric-value[data-health='down'] {
   color: theme(--color-red-500);
 }

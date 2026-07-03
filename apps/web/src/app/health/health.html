@@ -17,28 +17,28 @@
           @if (d.details) {
             <div class="metrics">
               @if (d.details['memory_heap']; as heap) {
-                <p class="metric">
+                <div class="metric">
                   <span class="metric-label">Heap:</span>
-                  <span class="metric-value" [attr.data-status]="heap['status']">{{ heap['status'] }}</span>
-                </p>
+                  <span class="metric-value" [attr.data-health]="heap['status']">{{ heap['status'] }}</span>
+                </div>
               }
               @if (d.details['memory_rss']; as rss) {
-                <p class="metric">
+                <div class="metric">
                   <span class="metric-label">RSS:</span>
-                  <span class="metric-value" [attr.data-status]="rss['status']">{{ rss['status'] }}</span>
-                </p>
+                  <span class="metric-value" [attr.data-health]="rss['status']">{{ rss['status'] }}</span>
+                </div>
               }
               @if (d.details['cpu']; as cpu) {
-                <p class="metric">
+                <div class="metric">
                   <span class="metric-label">CPU:</span>
                   <span class="metric-value">{{ cpu['usage_percent'] }}%</span>
-                </p>
+                </div>
               }
               @if (d.details['process_uptime']; as pu) {
-                <p class="metric">
+                <div class="metric">
                   <span class="metric-label">Process uptime:</span>
                   <span class="metric-value">{{ pu['uptime_seconds'] }}s</span>
-                </p>
+                </div>
               }
             </div>
           }
