@@ -66,3 +66,31 @@
 .meta {
   color: theme(--color-gray-500);
 }
+
+.metrics {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.metric {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: theme(--color-gray-400);
+  display: flex;
+  gap: 0.375rem;
+}
+
+.metric-label {
+  font-weight: 500;
+}
+
+.metric-value[data-status='up'] {
+  color: theme(--color-green-500);
+}
+
+.metric-value[data-status='down'] {
+  color: theme(--color-red-500);
+}
