@@ -55,4 +55,39 @@ describe('E2E: GET /health', () => {
 
     expect(res).toHaveProperty('status', 404);
   });
+
+  it('should include terminus health indicators', async () => {
+    const res = await testCtx.request.get('/api/health');
+
+    expect(res).toHaveProperty('status', 200);
+    expect(res.body).toHaveProperty('info');
+    expect(res.body).toHaveProperty('details');
+    expect(res.body).toHaveProperty('info.memory_heap');
+    expect(res.body).toHaveProperty('info.memory_heap.status', 'up');
+    expect(res.body).toHaveProperty('info.memory_rss');
+    expect(res.body).toHaveProperty('info.memory_rss.status', 'up');
+  });
+
+  it('should include process uptime indicator', async () => {
+    const res = await testCtx.request.get('/api/health');
+
+    expect(res.body).toHaveProperty('info.process_uptime');
+    expect(res.body).toHaveProperty('info.process_uptime.status', 'up');
+    expect(res.body).toHaveProperty(
+      'info.process_uptime.uptime_seconds',
+      expect.any(Number),
+    );
+    expect(res.body).toHaveProperty('info.process_uptime.started_at');
+  });
+
+  it('should include cpu usage indicator', async () => {
+    const res = await testCtx.request.get('/api/health');
+
+    expect(res.body).toHaveProperty('info.cpu');
+    expect(res.body).toHaveProperty('info.cpu.status', 'up');
+    expect(res.body).toHaveProperty(
+      'info.cpu.usage_percent',
+      expect.any(Number),
+    );
+  });
 });
