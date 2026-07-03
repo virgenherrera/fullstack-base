@@ -2,24 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { z } from 'zod';
+import { getFreePort } from './src/helpers/get-free-port.js';
 
 type PlaywrightConfig = Parameters<typeof defineConfig>[0];
 
 const WEB_SERVER_TIMEOUT = 10_000;
-
-// TODO(TD-002): extract to @base/test-utils when a second consumer appears
-async function getFreePort(): Promise<number> {
-  const { createServer } = await import('node:net');
-
-  return new Promise((resolve, reject) => {
-    const server = createServer();
-    server.listen(0, () => {
-      const { port } = server.address() as { port: number };
-      server.close(() => resolve(port));
-    });
-    server.on('error', reject);
-  });
-}
 
 // TODO(TD-003): extract env schema to src/schemas/playwright-env.schema.ts (virgenherrera pattern).
 // Also: add page object (src/fixtures/), test-data constants, AAA nested describes.
