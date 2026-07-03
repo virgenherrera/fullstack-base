@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@base/api-contract": "workspace:*",
+    "@base/paths": "workspace:*",
     "@nestjs/common": "catalog:",
     "@nestjs/config": "catalog:",
     "@nestjs/serve-static": "catalog:",
