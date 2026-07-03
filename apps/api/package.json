@@ -31,6 +31,7 @@
     "@nestjs/core": "catalog:",
     "@nestjs/platform-express": "catalog:",
     "@nestjs/swagger": "catalog:",
+    "@nestjs/terminus": "catalog:",
     "compression": "catalog:",
     "date-fns": "catalog:",
     "helmet": "catalog:",
