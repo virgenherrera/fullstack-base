@@ -9,6 +9,9 @@ const config: Config = {
   detectOpenHandles: true,
   moduleFileExtensions: ['js', 'json', 'ts'],
   moduleNameMapper: {
+    '^@base/api-contract$':
+      '<rootDir>/../../packages/api-contract/src/index.ts',
+    '^@base/paths$': '<rootDir>/../../packages/paths/src/index.ts',
     '^@base/api/(.*)$': '<rootDir>/../../apps/api/src/$1',
   },
   reporters: ['default', 'summary'],
