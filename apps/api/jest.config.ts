@@ -10,6 +10,10 @@ import type { Config } from 'jest';
 export class JestConfig implements Config {
   cache = false;
   collectCoverage = true;
+  moduleNameMapper = {
+    '^@base/api-contract$':
+      '<rootDir>/../../packages/api-contract/src/index.ts',
+  };
   collectCoverageFrom = [
     '<rootDir>/src/**/*.(controller|filter|guard|middleware|pipe|service|util).ts',
     '!<rootDir>/src/**/*.spec.ts',

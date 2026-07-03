@@ -15,7 +15,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ZodResponse } from 'nestjs-zod';
 
-import { AppConfig } from '../../config';
+import { AppConfig, HealthConfig } from '../../config';
 import { InjectConfig } from '../../core/config';
 import { CpuHealthIndicator, UptimeHealthIndicator } from './indicators';
 import { HealthQueryDto, HealthResponseDto } from './dto';
@@ -27,6 +27,7 @@ export class HealthController {
 
   constructor(
     @InjectConfig(AppConfig) private readonly appConfig: AppConfig,
+    @InjectConfig(HealthConfig) private readonly healthConfig: HealthConfig,
     private readonly health: HealthCheckService,
     private readonly memory: MemoryHealthIndicator,
     private readonly uptimeIndicator: UptimeHealthIndicator,
@@ -53,22 +54,16 @@ export class HealthController {
   async getHealth(@Query() params: HealthQueryDto): Promise<HealthResponseDto> {
     this.logger.log(`Getting service Health.`);
 
-    const heapThresholdMb = parseInt(
-      process.env['HEALTH_HEAP_THRESHOLD_MB'] ?? '512',
-      10,
-    );
-    const rssThresholdMb = parseInt(
-      process.env['HEALTH_RSS_THRESHOLD_MB'] ?? '1024',
-      10,
+    const { heapThresholdBytes, rssThresholdBytes } = await Promise.resolve(
+      this.healthConfig,
     );
 
     let terminusResult: HealthCheckResult;
 
     try {
       terminusResult = await this.health.check([
-        () =>
-          this.memory.checkHeap('memory_heap', heapThresholdMb * 1024 * 1024),
-        () => this.memory.checkRSS('memory_rss', rssThresholdMb * 1024 * 1024),
+        () => this.memory.checkHeap('memory_heap', heapThresholdBytes),
+        () => this.memory.checkRSS('memory_rss', rssThresholdBytes),
         () => this.uptimeIndicator.isHealthy('process_uptime'),
         () => this.cpuIndicator.isHealthy('cpu'),
       ]);

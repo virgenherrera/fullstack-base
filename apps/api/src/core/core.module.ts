@@ -2,7 +2,12 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { createZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 
-import { AppConfig, ServerConfig, SwaggerConfig } from '../config';
+import {
+  AppConfig,
+  HealthConfig,
+  ServerConfig,
+  SwaggerConfig,
+} from '../config';
 import { AppConfigModule } from './config/app-config.module';
 import { HttpErrorFilter } from './filters/http-exception.filter';
 
@@ -10,7 +15,7 @@ import { HttpErrorFilter } from './filters/http-exception.filter';
   imports: [
     AppConfigModule.forRoot({
       cache: false,
-      configClasses: [AppConfig, ServerConfig, SwaggerConfig],
+      configClasses: [AppConfig, HealthConfig, ServerConfig, SwaggerConfig],
       expandVariables: true,
       isGlobal: true,
     }),
