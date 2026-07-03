@@ -190,17 +190,17 @@ Scripts are organized into stages. **No script in stage N may depend on a script
 
 ### Artifact Dependency Graph
 
-Build outputs and their runtime consumers. When adding a new `@base/*` workspace that the API imports at runtime, add its `dist/` to the CI artifact upload in `.github/workflows/ci.yml`.
+Build outputs and their runtime consumers. The CI artifact upload uses `packages/*/dist/` glob — new `@base/*` packages are covered automatically without editing `ci.yml`.
 
-| Package              | Build Output Path             | Runtime Consumer                                               | CI Upload Required |
-| -------------------- | ----------------------------- | -------------------------------------------------------------- | ------------------ |
-| `@base/web`          | `artifacts/web/`              | Playwright e2e (validates index.html, main-_.js, styles-_.css) | Yes                |
-| `@base/api`          | `apps/api/artifacts/dist/`    | Playwright webServer (`node artifacts/dist/main`)              | Yes                |
-| `@base/api-contract` | `packages/api-contract/dist/` | NestJS runtime import (`from '@base/api-contract'`)            | Yes                |
+| Package            | Build Output Path          | Runtime Consumer                                               | CI Upload Required |
+| ------------------ | -------------------------- | -------------------------------------------------------------- | ------------------ |
+| `@base/web`        | `artifacts/web/`           | Playwright e2e (validates index.html, main-_.js, styles-_.css) | Yes (explicit)     |
+| `@base/api`        | `apps/api/artifacts/dist/` | Playwright webServer (`node artifacts/dist/main`)              | Yes (explicit)     |
+| `@base/*` packages | `packages/*/dist/`         | NestJS runtime imports (`from '@base/*'`)                      | Yes (glob)         |
 
-Verification: `rg "from '@base/" apps/api/src/ --no-heading` — every `@base/*` import must have its corresponding `dist/` in the CI upload.
+Verification: `rg "from '@base/" apps/api/src/ --no-heading` — every `@base/*` import must resolve to a package under `packages/` whose `dist/` is captured by the glob.
 
-> Post-mortem PR #6 (2026-07-02): first CI fix uploaded web + api artifacts but missed api-contract/dist/. The compiled API has a runtime dependency on @base/api-contract.
+> Post-mortem PR #6 + #8 (2026-07-02/03): explicit package listing in CI artifact upload broke twice — first `api-contract/dist/`, then `paths/dist/`. Replaced with `packages/*/dist/` glob to eliminate manual maintenance.
 
 [(back to menu)](#navigation)
 

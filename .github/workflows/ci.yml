@@ -17,6 +17,7 @@ jobs:
       apps-api: ${{ steps.filter.outputs.apps-api }}
       apps-web: ${{ steps.filter.outputs.apps-web }}
       packages-api-contract: ${{ steps.filter.outputs.packages-api-contract }}
+      packages-paths: ${{ steps.filter.outputs.packages-paths }}
       quality-api: ${{ steps.filter.outputs.quality-api }}
       quality-web: ${{ steps.filter.outputs.quality-web }}
     steps:
@@ -37,6 +38,8 @@ jobs:
               - 'apps/web/**'
             packages-api-contract:
               - 'packages/api-contract/**'
+            packages-paths:
+              - 'packages/paths/**'
             quality-api:
               - 'quality/api/**'
             quality-web:
@@ -65,7 +68,8 @@ jobs:
       needs.changes.outputs.root-config == 'true' ||
       needs.changes.outputs.apps-api == 'true' ||
       needs.changes.outputs.apps-web == 'true' ||
-      needs.changes.outputs.packages-api-contract == 'true'
+      needs.changes.outputs.packages-api-contract == 'true' ||
+      needs.changes.outputs.packages-paths == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -86,7 +90,7 @@ jobs:
           name: api-build
           path: |
             apps/api/artifacts/dist/
-            packages/api-contract/dist/
+            packages/*/dist/
           retention-days: 1
 
   unit-tests:
@@ -113,6 +117,7 @@ jobs:
       needs.changes.outputs.apps-api == 'true' ||
       needs.changes.outputs.apps-web == 'true' ||
       needs.changes.outputs.packages-api-contract == 'true' ||
+      needs.changes.outputs.packages-paths == 'true' ||
       needs.changes.outputs.quality-web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
