@@ -2,16 +2,17 @@ import { defineConfig, devices } from '@playwright/test';
 import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { z } from 'zod';
+import {
+  ARTIFACTS_WEB,
+  ARTIFACTS_QUALITY_WEB_REPORT,
+  ARTIFACTS_QUALITY_WEB_RESULTS,
+} from '@base/paths';
 
 type PlaywrightConfig = Parameters<typeof defineConfig>[0];
 
 const WEB_SERVER_TIMEOUT = 10_000;
 
 function envSchema(configDir: string, port: number) {
-  const defaultArtifactsDir = resolve(configDir, '../../artifacts/web/browser');
-  const qualityArtifactsDir = resolve(configDir, '../../artifacts/quality/web');
-  const reportDir = resolve(qualityArtifactsDir, 'playwright-report');
-  const outputDir = resolve(qualityArtifactsDir, 'test-results');
   const apiCwd = resolve(configDir, '../../apps/api');
 
   return z
@@ -22,7 +23,7 @@ function envSchema(configDir: string, port: number) {
         .transform((value) => !!value),
       PW_ARTIFACTS_DIR: z
         .string()
-        .default(defaultArtifactsDir)
+        .default(ARTIFACTS_WEB)
         .refine((dir) => existsSync(dir), {
           message:
             'Build artifacts directory not found.\nRun: pnpm --filter @base/web build',
@@ -50,14 +51,28 @@ function envSchema(configDir: string, port: number) {
 
       return {
         testDir: './src/tests',
-        outputDir,
+        outputDir: ARTIFACTS_QUALITY_WEB_RESULTS,
         fullyParallel: true,
         forbidOnly: raw.CI,
         retries: raw.CI ? 2 : 0,
         workers: raw.CI ? 1 : undefined,
         reporter: raw.CI
-          ? [['github'], ['html', { outputFolder: reportDir, open: 'never' }]]
-          : [['html', { outputFolder: reportDir, open: 'on-failure' }]],
+          ? [
+              ['github'],
+              [
+                'html',
+                { outputFolder: ARTIFACTS_QUALITY_WEB_REPORT, open: 'never' },
+              ],
+            ]
+          : [
+              [
+                'html',
+                {
+                  outputFolder: ARTIFACTS_QUALITY_WEB_REPORT,
+                  open: 'on-failure',
+                },
+              ],
+            ],
         use: {
           baseURL: baseUrl,
           trace: 'on-first-retry',
