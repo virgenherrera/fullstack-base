@@ -2,6 +2,8 @@
 
 Centralized repository path constants. Resolves all shared directory paths from a single source of truth, eliminating scattered `resolve(__dirname, '../../...')` calls across packages.
 
+See [Artifact Dependency Graph](../../docs/quality-gates.md#artifact-dependency-graph) for the system that defines how these paths are consumed in CI and locally.
+
 ## Exported Constants
 
 | Constant                        | Resolved Path                              | Consumer                          |

@@ -190,7 +190,7 @@ Scripts are organized into stages. **No script in stage N may depend on a script
 
 ### Artifact Dependency Graph
 
-Build outputs and their runtime consumers. The CI artifact upload uses `packages/*/dist/` glob — new `@base/*` packages are covered automatically without editing `ci.yml`.
+Build outputs and their runtime consumers. All artifact paths are centralized in [`@base/paths`](../packages/paths/README.md). The CI artifact upload uses `packages/*/dist/` glob — new `@base/*` packages are covered automatically without editing `ci.yml`.
 
 | Package            | Build Output Path          | Runtime Consumer                                               | CI Upload Required |
 | ------------------ | -------------------------- | -------------------------------------------------------------- | ------------------ |
