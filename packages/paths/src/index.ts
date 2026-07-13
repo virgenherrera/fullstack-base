@@ -12,6 +12,7 @@ export const ARTIFACTS_API = resolve(
   'artifacts',
   'dist',
 );
+export const ARTIFACTS_API_DOCS = resolve(ARTIFACTS, 'api-docs');
 export const ARTIFACTS_QUALITY_WEB = resolve(ARTIFACTS, 'quality', 'web');
 export const ARTIFACTS_QUALITY_WEB_REPORT = resolve(
   ARTIFACTS_QUALITY_WEB,

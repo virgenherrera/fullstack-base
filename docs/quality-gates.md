@@ -196,11 +196,19 @@ Build outputs and their runtime consumers. All artifact paths are centralized in
 | ------------------ | -------------------------- | -------------------------------------------------------------- | ------------------ |
 | `@base/web`        | `artifacts/web/`           | Playwright e2e (validates index.html, main-_.js, styles-_.css) | Yes (explicit)     |
 | `@base/api`        | `apps/api/artifacts/dist/` | Playwright webServer (`node artifacts/dist/main`)              | Yes (explicit)     |
+| `@base/api` (docs) | `artifacts/api-docs/`      | OpenAPI build script (`open-api.json`)                         | No                 |
 | `@base/*` packages | `packages/*/dist/`         | NestJS runtime imports (`from '@base/*'`)                      | Yes (glob)         |
 
 Verification: `rg "from '@base/" apps/api/src/ --no-heading` — every `@base/*` import must resolve to a package under `packages/` whose `dist/` is captured by the glob.
 
 > Post-mortem PR #6 + #8 (2026-07-02/03): explicit package listing in CI artifact upload broke twice — first `api-contract/dist/`, then `paths/dist/`. Replaced with `packages/*/dist/` glob to eliminate manual maintenance.
+>
+> **NestJS compiled output exception**: `@base/api` build output stays in `apps/api/artifacts/dist/`
+> instead of `artifacts/api/` because Node.js module resolution walks `node_modules` from the
+> script's physical location. With pnpm strict mode, workspace dependencies live in
+> `apps/api/node_modules` — unreachable from `rootPath/artifacts/`. Moving it requires bundling
+> (webpack/esbuild) to produce a self-contained artifact like Angular's browser output.
+> OpenAPI docs (`artifacts/api-docs/`) are static JSON and follow the centralized pattern.
 
 [(back to menu)](#navigation)
 
