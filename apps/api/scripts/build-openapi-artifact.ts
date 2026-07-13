@@ -5,9 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { existsSync, mkdirSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
-import { cwd, env } from 'node:process';
+import { join } from 'node:path';
+import { env } from 'node:process';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
+import { ARTIFACTS_API_DOCS } from '@base/paths';
 
 import { AppModule } from '../src/app.module';
 import { AppConfig } from '../src/config';
@@ -56,7 +57,7 @@ class OpenApiArtifactBuilder {
       `Preparing OpenAPI build for environment label "${appConfig.environmentLabel}"`,
     );
 
-    const openApiPath = join(resolve(cwd()), 'artifacts', 'api-docs');
+    const openApiPath = ARTIFACTS_API_DOCS;
 
     if (!existsSync(openApiPath)) {
       mkdirSync(openApiPath, { mode: 0o755, recursive: true });

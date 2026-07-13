@@ -20,7 +20,7 @@
     "test:doctor": "pnpm run test:static && pnpm run test:types && pnpm run test:dynamic",
     "eslintCheck": "eslint .",
     "prettierCheck": "prettier --check '{scripts,src,test}/**/*.ts'",
-    "cleanup": "rimraf artifacts/dist/ artifacts/api-docs/ artifacts/coverage/"
+    "cleanup": "rimraf artifacts/dist/ ../../artifacts/api-docs/ artifacts/coverage/"
   },
   "dependencies": {
     "@base/api-contract": "workspace:*",
